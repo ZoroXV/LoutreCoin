@@ -72,7 +72,7 @@ class Block:
     for transaction in self.transactions:
       transactionsHash += transaction.hash
 
-    clearStr = str(self.time) + transactionsHash + self.prev
+    clearStr = str(self.index) + str(self.time) + transactionsHash + self.prev
     return hashlib.sha256(str.encode(clearStr)).hexdigest()
 
 class Transaction:
