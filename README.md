@@ -66,6 +66,7 @@ Il faut maintenant implémenter le hachage de nos transactions et de nos blocs, 
 ```python
 class Block:
   # …
+  
   def calculateHash():
     transactionsHash = ""
     for transaction in self.transactions:
@@ -75,7 +76,7 @@ class Block:
     return hashlib.sha256(str.encode(clearStr)).hexdigest()
 
 class Transaction:
-	# …
+  # …  
   
   def calculateHash(self):
     clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
