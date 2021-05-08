@@ -27,11 +27,57 @@ En effet, la cryptographie va nous être très utile dans de nombreux aspects de
 sha256(0) = 5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9
 sha256(1) = 6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b
 ```
-
-On voit bien avec cet exemple que nos deux “hash” sont complètement différents. Ainsi pour garantir la fiabilité de nos blocs on prendra comme donnée d'entrée de la fonction de hash la liste de nos transactions avec le format suivant:
-
+On voit bien avec cet exemple que nos deux “hash” sont complètement différents. Ainsi pour garantir la fiabilité de nos blocs on prendra comme donnée d'entrée de la fonction de hash du bloc les informations diverses du bloc ainsi que la liste des “hash” de nos transactions avec le format  d'entrée suivant:
 ```
 Date Transaction + Sender + Amount + Receiver
 ```
 
-On a enfin tous les éléments nécessaire de design pour commencer à implémenter notre **Blockchain Maison**.
+On a enfin tous les éléments nécessaire de design pour commencer à implémenter notre **Blockchain Maison**
+
+## Début du codage
+On a donc besoin de 3 classes Python pour représenter la Blockchain:
+
+```python
+class Blockchain:
+  def __init__(self):
+    self.chain = []
+
+class Block:
+  def __init__(self, transactions, time, index):
+    self.index = index
+    self.transactions = transactions
+    self.time = time
+    self.prev = ''
+    self.hash = ''
+
+class Transaction:
+  def __init__(self, sender, receiver, amount):
+    self.sender = sender
+    self.receiver = receiver
+    self.amount = amount
+    self.time = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+    self.hash = ''
+```
+
+On a donc des transactions qui gèrent des données plutôt classiques: un émetteur, un receveur, un montant et une date.  Ensuite nous avons nos blocs qui stockent une liste de transaction, une date de création et un index qui correspond au numéro du bloc fraîchement créé. Enfin, la Blockchain en elle-même qui stocke simplement une liste de blocs.
+
+Il faut maintenant implémenter le hachage de nos transactions et de nos blocs, pour ca nous utiliserons le module *hashlib* directement disponible dans la bibliothèque standard de **Python**. On implémente donc la fonction `calculateHash()` dans les classes `Block` et `Transaction`. On obtient donc le code suivant:
+
+```python
+class Block:
+  # …
+  def calculateHash():
+    transactionsHash = ""
+    for transaction in self.transactions:
+      transactionsHash += transaction.hash
+
+    clearStr = str(self.time) + transactionsHash + self.prev
+    return hashlib.sha256(str.encode(clearStr)).hexdigest()
+
+class Transaction:
+	# …
+  
+  def calculateHash(self):
+    clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
+    return hashlib.sha256(str.encode(clearStr)).hexdigest()
+```
