@@ -5,6 +5,14 @@ class Blockchain:
     def __init__(self):
         self.chain = []
 
+    def addBlock(self, block):
+        if (len(self.chain) > 0):
+            block.prev = self.chain[-1].hash
+        else:
+            block.prev = "None"
+
+        self.chain.append(block)
+
 class Block:
     def __init__(self, transactions, time, index):
         self.index = index
@@ -18,7 +26,7 @@ class Block:
         for transaction in self.transactions:
             transactionsHash += transaction.hash
 
-        clearStr = str(self.time) + transactionsHash + self.prev
+        clearStr = str(self.index) + str(self.time) + transactionsHash + self.prev
         return hashlib.sha256(str.encode(clearStr)).hexdigest()
 
 class Transaction:
