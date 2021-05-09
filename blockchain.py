@@ -1,4 +1,6 @@
 from datetime import datetime
+from Crypto.PublicKey import RSA
+from Crypto.Signature import *
 import hashlib
 
 class Blockchain:
@@ -25,8 +27,8 @@ class Blockchain:
 
     def mine(self, miner):
         pendingSize = len(self.pendingTransactions)
-        if (pendingSize <= 0):
-            print("Not enough pending transactions to mine a new block. Must be > 1")
+        if (pendingSize < self.blockSize):
+            print("Not enough pending transactions to mine a new block. Must be > ", self.blockSize)
             return False
         else:
             for i in range(0, pendingSize, self.blockSize):
@@ -46,11 +48,42 @@ class Blockchain:
 
             print("Mining pending transactions success!")
 
-            rewardMiner = Transaction("LoutreCoin mining reward", miner, self.mineReward)
+            rewardMiner = Transaction("LoutreCoin", miner, self.mineReward)
             self.pendingTransactions = [rewardMiner]
 
         return True
 
+    def generateKeys(self):
+        key = RSA.generate(2048)
+        private_key = key.export_key()
+        file_out = open("rsa_pub.key", "wb")
+        file_out.write(private_key)
+
+        public_key = key.publickey().export_key()
+        file_out = open("rsa.key", "wb")
+        file_out.write(public_key)
+
+        return key.publickey().export_key().decode('ASCII')
+
+    def addTransaction(self, sender, reciever, amt, keyString, senderKey):
+        keyByte = keyString.encode("ASCII");
+        senderKeyByte = senderKey.encode("ASCII");
+
+        key = RSA.import_key(keyByte);
+        senderKey = RSA.import_key(senderKeyByte);
+
+        if not sender or not reciever or not amt:
+            print("Invalid Transaction parameters");
+            return False;
+
+        transaction = Transaction(sender, reciever, amt);
+        transaction.signTransaction(key, senderKey);
+
+        if not transaction.isValidTransaction():
+            print("");
+            return False;
+        self.pendingTransactions.append(transaction);
+        return len(self.chain) + 1;
 
 class Block:
     def __init__(self, transactions, time, index):
@@ -91,3 +124,32 @@ class Transaction:
     def calculateHash(self):
         clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
         return hashlib.sha256(str.encode(clearStr)).hexdigest()
+
+    def isValidTransaction(self):
+
+        if(self.hash != self.calculateHash()):
+            return False;
+        if(self.sender == self.receiver):
+            return False;
+        if(self.sender == "LoutreCoin"):
+            #security : unfinished
+            return True;
+        if not self.signature or len(self.signature) == 0:
+            print("No Signature!")
+            return False;
+        return True;
+
+    def signTransaction(self, key, senderKey):
+        if(self.hash != self.calculateHash()):
+            print("transaction tampered error")
+            return False
+
+        if(str(key.publickey().export_key()) != str(senderKey.publickey().export_key())):
+            print("Transaction attempt to be signed from another wallet")
+            return False
+
+        pkcs1_15.new(key)
+
+        self.signature = "made"
+        print("made signature!")
+        return True
