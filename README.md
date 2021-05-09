@@ -66,6 +66,7 @@ Il faut maintenant implémenter le hachage de nos transactions et de nos blocs, 
 ```python
 class Block:
   # …
+  self.hash = self.calculateHash()
   
   def calculateHash():
     transactionsHash = ""
@@ -76,9 +77,25 @@ class Block:
     return hashlib.sha256(str.encode(clearStr)).hexdigest()
 
 class Transaction:
-  # …  
+  # …
+  self.hash = self.calculateHash()
   
   def calculateHash(self):
     clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
     return hashlib.sha256(str.encode(clearStr)).hexdigest()
+```
+
+J'en profite également pour implémenter l'ajout d'un bloc dans la **Blockchain** qui mettra à jour le champ `prev` avec le dernier bloc actuel de la chaîne. La fonction est la suivante:
+
+```python
+#TODO
+```
+
+Nous avons maintenant une première version fonctionnel de notre **Blockchain**. Est-on pour autant sûr de la fiabilité de nos données ? Pas vraiment... En effet, reprenons l’exemple de notre groupe de 10 personnes avec Monsieur A et Madame B, si parmi les 10 personnes se trouve quelqu’un avec de mauvaises intentions. Cette personne cherche à se donner plus d’argent en modifiant un registre, il lui suffira d’avoir le contrôle sur plus de 50% du réseau pair-à-pair et de modifier une transaction à la main. En modifiant cette transaction le hash de cette dernière sera forcément changer, ainsi le hash du bloc dans laquelle se trouve la transaction sera également modifié. En changeant uniquement un bloc, l’attaque échoue car le hash du bloc qui suit dans la chaîne ne stockera pas le bon hash pour le bloc précédent sauf que actuellement il est très rapide de calculer le hash des blocs. Il suffira donc à notre attaquant de recalculer tous les hash de la chaîne pour obtenir une version “valide” de la blockchain malgré la transaction frauduleuse introduite. On va donc pouvoir introduire un nouveau mécanisme dans notre **Blockchain** pour contrer ce genre d’attaques: la preuve de travail (Proof of Work en anglais).
+
+## La preuve de travail
+La preuve de travail est une manière de dissuader les attaques par déni de service en requérant de la puissance de calcul de l’appareil demandeur du service. Appliqué à la Blockchain cela permet d'éviter une modification frauduleuse des transactions car il serait trop coûteux à notre attaquant de recalculer la totalité des hash de chaque bloc. Le principe de la preuve de travail est de calculer le hash d’un bloc jusqu'à que ce dernier commence par un nombre prédéterminé de 0 en guise d'en-tête du hash, par exemple, au lieu d’avoir des hash de la forme suivante: `5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9` on aura des hash de la forme suivante avec 4 zéros en entete par exemple: `0000b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b`. Pour forcer le hash à prendre cet forme on influe sur les données en entrée de la fonction de hash avec un entier **x** calculer par “brute force”, ce processus s’appelle le **minage**. Il s’agit donc d’essayer avec un **x** allant de 0 à l’infini de 1 en 1, on essayera donc toutes les valeurs possibles jusqu’à obtenir un hash respectant le format souhaité. Pour motiver les utilisateurs du réseau à calculer ces preuves de travail et donc de miner des blocs pour sauvegarder les transactions, on récompense la première personne à miner un nouveau bloc (c’est à dire trouver le **x** inconnu) avec un certain montant de cryptomonnaie, ici on choisira arbitrairement de donner un LoutreCoin (1 LC). Nos transactions ne seront donc effectives qu’à partir du moment où elles se trouveront dans un bloc valide (qui a été miné), on va donc rajouter une liste de transactions en attente dans notre classe `Blockchain` et les fonctions nécessaires pour miner un bloc. On a donc une classe Blockchain qui ressemble à ce qui suit:
+
+```python
+# TODO
 ```
