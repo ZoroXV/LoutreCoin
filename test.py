@@ -1,17 +1,13 @@
 from blockchain import *
 from datetime import datetime
 
-time = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
 blockchain = Blockchain()
 
-blockA = Block([], time, 0)
-blockchain.addBlock(blockA)
+tr1 = Transaction("Monsieur A", "Madame B", 100)
 
-blockB = Block([], time, 1)
-blockchain.addBlock(blockB)
+blockchain.pendingTransactions.append(tr1)
 
-blockC = Block([], time, 2)
-blockchain.addBlock(blockC)
+blockchain.mine("Steve")
 
 for block in blockchain.chain:
     print(block.index)
