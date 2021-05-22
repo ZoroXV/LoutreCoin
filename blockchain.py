@@ -28,7 +28,7 @@ class Blockchain:
     def mine(self, miner):
         pendingSize = len(self.pendingTransactions)
         if (pendingSize < self.blockSize):
-            print("Not enough pending transactions to mine a new block. Must be > ", self.blockSize)
+            print("Not enough pending transactions to mine a new block. Must be >=", self.blockSize)
             return False
         else:
             for i in range(0, pendingSize, self.blockSize):
