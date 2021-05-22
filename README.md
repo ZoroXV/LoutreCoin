@@ -26,7 +26,7 @@ Nous avons désormais des blocs de transactions pour conserver nos registres à 
 
 ## Cryptographie joins the battle !  *Smash Brawl ~ Main Theme*
 Dans cette partie, je vais introduire et expliquer en quoi la cryptographie va rendre la Blockchain très attrayante pour une cryptomonnaie et un réseau pair-à-pair.
-En effet, la cryptographie va nous être très utile dans de nombreux aspects de la Blockchain. Dans un premier temps, on va se servir de la cryptographie et plus particulièrement de la fonction de hachage sha-256 pour nommer nos blocs de manière unique et pour garantir la validité des données. Une fonction de hachage est une fonction particulière qui prend des données en entrée et donne comme résultat une suite de caractères alphanumérique unique unique. Par exemple on peut comparer les “hash” de 0 et 1 en sha-256:
+En effet, la cryptographie va nous être très utile dans de nombreux aspects de la Blockchain. Dans un premier temps, on va se servir de la cryptographie et plus particulièrement de la fonction de hachage sha-256 pour nommer nos blocs de manière unique et pour garantir la validité des données. Une fonction de hachage est une fonction particulière qui prend des données en entrée et donne comme résultat une suite de caractères alphanumérique unique. Par exemple on peut comparer les “hash” de 0 et 1 en sha-256:
 
 ```python
 sha256(0) = 5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9
