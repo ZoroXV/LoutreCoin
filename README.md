@@ -3,6 +3,8 @@
 ## Introduction
 J'ai choisi ce sujet parce que je m'intéresse à la cryptomonnaie depuis 2016. Je partais de base sur une explication du système de blockchain et de décentralisation qui est la clé de voûte du Bitcoin, mais je me suis dit que cela serait plus amusant d'expliquer tout ça avec un cas pratique: la création du **LoutreCoin**, une cryptomonnaie spécialement faite pour payer son abonnement internet chez Loutre Télécom. Ainsi, chaque explication théorique sera accompagné de son implémentation en **Python 3**.
 
+## Un peu d'histoire
+
 ## Une Cryptomonnaie c'est quoi ? Ça fonctionne comment ?
 Dans cette partie, je vais tâcher d'expliquer ce qu'est une cryptomonnaie, son utilité et son fonctionnement. Pour commencer la cryptomonnaie est née de l'envie de quelques personnes de se détacher de toutes dépendance à un quelconque tiers pour gérer nos échanges commerciaux. En effet, dans le système monétaire actuel, lorsque Monsieur A souhaite envoyer 20 euros à Madame B, il doit contacter sa banque pour demander à cette dernière d’effectuer un virement vers le compte en banque de Madame B. Lors de cet échange, Monsieur A et Madame B font confiance à leur banque pour garantir la validité de cet échange. Ainsi, une unique entité tient les registres de toutes les transactions commerciales effectuées dans notre société (dans la vraie vie, il n’y a pas qu’une seule banque mais le système repose malgré tout sur un faible nombre d’entités). Dans le but de se détacher de cette “Banque Centrale” la cryptomonnaie est née. La définition la plus général est la suivante: une cryptomonnaie est une monnaie régie par aucune banque centrale, émise de pair-à-pair (**P2P**) et se basant sur la **Cryptographie** pour garantir la fiabilité des informations et l'anonymat des utilisateurs du réseau.
 
@@ -12,7 +14,7 @@ Comme évoquer juste au-dessus notre cryptomonnaie repose sur un réseau pair-à
 ![P2P](p2p.png "Réseau pair-à-pair")
 
 ### Le réseau pair-à-pair d’une cryptomonnaie
-Pour reprendre notre exemple précédent, Monsieur A et Madame B sont membres d’un réseau pair-à-pair de 10 personnes. Lorsque Monsieur A souhaite envoyer 20 euros à Madame B, il l’annonce au réseau et chaque membre du réseau va vérifier avec sa version des registres que A possède le solde nécessaire pour transmettre de l’argent à B. Si la majorité du réseau donne son accord à la transaction, cette dernière est actée et les membres ayant refusé la transaction doivent modifier leur version local des données pour s’aligner sur celle adopté par la majorité. A et B sont donc totalement détachés d’une banque centrale vu qu’ici chacun utilisateur du réseau tient un registre des transactions commerciales.
+Pour reprendre notre exemple précédent, Monsieur A et Madame B sont membres d’un réseau pair-à-pair de 10 personnes. Lorsque Monsieur A souhaite envoyer 20 euros à Madame B, il l’annonce au réseau et chaque membre du réseau va vérifier avec sa version des registres que A possède le solde nécessaire pour transmettre de l’argent à B. Si la majorité du réseau donne son accord à la transaction, cette dernière est actée et les membres ayant refusé la transaction doivent modifier leur version local des données pour s’aligner sur celle adopté par la majorité. A et B sont donc totalement détachés d’une banque centrale vu qu’ici chacun des utilisateur du réseau tient un registre des transactions commerciales.
 
 ## Principe de base d’une Blockchain
 L'exemple ci-dessus stipule que chacun stock l’historique des transactions du réseau au fil du temps sans jamais supprimer ces dernières. Il faut donc trouver un moyen efficace de stocker la donnée dans le temps. La solution qui n’a pas du tout été divulguée dans le titre de cette partie c’est … Surprise ! La **Blockchain** ! En effet, la Blockchain est une manière de conserver de la donnée. Comme indiqué dans le nom il s’agit d’une chaîne de blocs où chacun des blocs est un ensemble de données, à tout hasard: des transactions. Chaque bloc se retrouve donc attribué à un nom unique et conserve un certain nombre de transactions (par exemple une dizaine) et le nom du bloc qui le précède dans la chaîne, sinon on aurait pas une chaîne mais juste un amas de blocs désordonnés. 
@@ -43,24 +45,24 @@ On a donc besoin de 3 classes Python pour représenter la Blockchain:
 
 ```python
 class Blockchain:
-  def __init__(self):
-    self.chain = []
+    def __init__(self):
+        self.chain = []
 
 class Block:
-  def __init__(self, transactions, time, index):
-    self.index = index
-    self.transactions = transactions
-    self.time = time
-    self.prev = ''
-    self.hash = ''
+    def __init__(self, transactions, time, index):
+        self.index = index
+        self.transactions = transactions
+        self.time = time
+        self.prev = ''
+        self.hash = ''
 
 class Transaction:
-  def __init__(self, sender, receiver, amount):
-    self.sender = sender
-    self.receiver = receiver
-    self.amount = amount
-    self.time = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-    self.hash = ''
+    def __init__(self, sender, receiver, amount):
+        self.sender = sender
+        self.receiver = receiver
+        self.amount = amount
+        self.time = datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+        self.hash = ''
 ```
 
 On a donc des transactions qui gèrent des données plutôt classiques: un émetteur, un receveur, un montant et une date.  Ensuite nous avons nos blocs qui stockent une liste de transaction, une date de création et un index qui correspond au numéro du bloc fraîchement créé. Enfin, la Blockchain en elle-même qui stocke simplement une liste de blocs.
@@ -69,35 +71,35 @@ Il faut maintenant implémenter le hachage de nos transactions et de nos blocs, 
 
 ```python
 class Block:
-  # …
-  self.hash = self.calculateHash()
+    # …
+    self.hash = self.calculateHash()
   
-  def calculateHash():
-    transactionsHash = ""
-    for transaction in self.transactions:
-      transactionsHash += transaction.hash
+    def calculateHash():
+        transactionsHash = ""
+        for transaction in self.transactions:
+            transactionsHash += transaction.hash
 
     clearStr = str(self.index) + str(self.time) + transactionsHash + self.prev
     return hashlib.sha256(str.encode(clearStr)).hexdigest()
 
 class Transaction:
-  # …
-  self.hash = self.calculateHash()
+    # …
+    self.hash = self.calculateHash()
   
-  def calculateHash(self):
-    clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
-    return hashlib.sha256(str.encode(clearStr)).hexdigest()
+    def calculateHash(self):
+        clearStr = str(self.time) + self.sender + str(self.amount) + self.receiver
+        return hashlib.sha256(str.encode(clearStr)).hexdigest()
 ```
 
 J'en profite également pour implémenter l'ajout d'un bloc dans la **Blockchain** qui mettra à jour le champ `prev` avec le dernier bloc actuel de la chaîne. La fonction est la suivante:
 
 ```python
 def addBlock(self, block):
-  if (len(self.chain) > 0):
-    block.prev = self.chain[-1].hash
-   else:
-    block.prev = "None"
-  self.chain.append(block)
+    if (len(self.chain) > 0):
+        block.prev = self.chain[-1].hash
+    else:
+        block.prev = "None"
+    self.chain.append(block)
 ```
 
 Nous avons maintenant une première version fonctionnel de notre **Blockchain**. Est-on pour autant sûr de la fiabilité de nos données ? Pas vraiment... En effet, reprenons l’exemple de notre groupe de 10 personnes avec Monsieur A et Madame B, si parmi les 10 personnes se trouve quelqu’un avec de mauvaises intentions. Cette personne cherche à se donner plus d’argent en modifiant un registre, il lui suffira d’avoir le contrôle sur plus de 50% du réseau pair-à-pair et de modifier une transaction à la main. En modifiant cette transaction le hash de cette dernière sera forcément changer, ainsi le hash du bloc dans laquelle se trouve la transaction sera également modifié. En changeant uniquement un bloc, l’attaque échoue car le hash du bloc qui suit dans la chaîne ne stockera pas le bon hash pour le bloc précédent sauf que actuellement il est très rapide de calculer le hash des blocs. Il suffira donc à notre attaquant de recalculer tous les hash de la chaîne pour obtenir une version “valide” de la blockchain malgré la transaction frauduleuse introduite. On va donc pouvoir introduire un nouveau mécanisme dans notre **Blockchain** pour contrer ce genre d’attaques: la preuve de travail (Proof of Work en anglais).
@@ -270,4 +272,6 @@ Pour terminer ce petit projet on a une dernière fonction pour ajouter propremen
 ```
 
 ## Conclusion
-Pour conclure, ce projet est fonctionnel mais comme tout projet il me reste encore mille et une améliorations possibles. Malgré tout j’espère avoir atteint mon objectif qui était de vous introduire au monde captivant de la Cryptomonnaie et de vous permettre d’acquérir toutes les clés pour comprendre le fonctionnement d’une Blockchain à travers le LoutreCoin.
+Pour conclure, ce projet est fonctionnel mais comme tout projet il me reste encore mille et une améliorations possibles. Malgré tout j’espère avoir atteint mon objectif qui était de vous introduire au monde captivant de la Cryptomonnaie et de vous permettre d’acquérir toutes les clés pour comprendre le fonctionnement d’une Blockchain à travers le LoutreCoin. De plus ci-dessous vous trouverez un diagramme UML résumant la structure du projet.
+
+![UML](uml.png "UML")
