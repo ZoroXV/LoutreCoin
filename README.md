@@ -4,6 +4,9 @@
 J'ai choisi ce sujet parce que je m'intéresse à la cryptomonnaie depuis 2016. Je partais de base sur une explication du système de blockchain et de décentralisation qui est la clé de voûte du Bitcoin, mais je me suis dit que cela serait plus amusant d'expliquer tout ça avec un cas pratique: la création du **LoutreCoin**, une cryptomonnaie spécialement faite pour payer son abonnement internet chez Loutre Télécom. Ainsi, chaque explication théorique sera accompagné de son implémentation en **Python 3**.
 
 ## Un peu d'histoire
+Le concept de cryptomonnaie est un concept qui existait déjà bien avant la création du Bitcoin. L’entreprise, DigiCash Inc. fondée en 1989 par David Chaum, le fut dans le but de créer la première monnaie virtuelle utilisée dans le monde entier. DigiCash était une entreprise de monnaie virtuelle. Elle a créé un protocole de paiement anonyme basé sur la cryptographie. Néanmoins, Digicash a échoué dans son projet d’adoption massive de sa cryptomonnaie. L’entreprise a été forcée de déclarer faillite en 1998.
+
+En 1998, Wei Dai a publié une description de « b-money », un système électronique de trésorerie anonyme. Peu après, Nick Szabo a créé le « Bit Gold » qui demandait aux utilisateurs de compléter une fonction de preuve de travail dont les solutions étaient chiffrées, mises ensemble et publiées. Le Bitcoin, créé en 2009 par un développeur (ou un groupe de développeurs) utilisant le pseudonyme de Satoshi Nakamoto, exploite l'algorithme SHA-256 comme système de preuve de travail.
 
 ## Une Cryptomonnaie c'est quoi ? Ça fonctionne comment ?
 Dans cette partie, je vais tâcher d'expliquer ce qu'est une cryptomonnaie, son utilité et son fonctionnement. Pour commencer la cryptomonnaie est née de l'envie de quelques personnes de se détacher de toutes dépendance à un quelconque tiers pour gérer nos échanges commerciaux. En effet, dans le système monétaire actuel, lorsque Monsieur A souhaite envoyer 20 euros à Madame B, il doit contacter sa banque pour demander à cette dernière d’effectuer un virement vers le compte en banque de Madame B. Lors de cet échange, Monsieur A et Madame B font confiance à leur banque pour garantir la validité de cet échange. Ainsi, une unique entité tient les registres de toutes les transactions commerciales effectuées dans notre société (dans la vraie vie, il n’y a pas qu’une seule banque mais le système repose malgré tout sur un faible nombre d’entités). Dans le but de se détacher de cette “Banque Centrale” la cryptomonnaie est née. La définition la plus général est la suivante: une cryptomonnaie est une monnaie régie par aucune banque centrale, émise de pair-à-pair (**P2P**) et se basant sur la **Cryptographie** pour garantir la fiabilité des informations et l'anonymat des utilisateurs du réseau.
@@ -102,7 +105,7 @@ def addBlock(self, block):
     self.chain.append(block)
 ```
 
-Nous avons maintenant une première version fonctionnel de notre **Blockchain**. Est-on pour autant sûr de la fiabilité de nos données ? Pas vraiment... En effet, reprenons l’exemple de notre groupe de 10 personnes avec Monsieur A et Madame B, si parmi les 10 personnes se trouve quelqu’un avec de mauvaises intentions. Cette personne cherche à se donner plus d’argent en modifiant un registre, il lui suffira d’avoir le contrôle sur plus de 50% du réseau pair-à-pair et de modifier une transaction à la main. En modifiant cette transaction le hash de cette dernière sera forcément changer, ainsi le hash du bloc dans laquelle se trouve la transaction sera également modifié. En changeant uniquement un bloc, l’attaque échoue car le hash du bloc qui suit dans la chaîne ne stockera pas le bon hash pour le bloc précédent sauf que actuellement il est très rapide de calculer le hash des blocs. Il suffira donc à notre attaquant de recalculer tous les hash de la chaîne pour obtenir une version “valide” de la blockchain malgré la transaction frauduleuse introduite. On va donc pouvoir introduire un nouveau mécanisme dans notre **Blockchain** pour contrer ce genre d’attaques: la preuve de travail (Proof of Work en anglais).
+Nous avons maintenant une première version fonctionnel de notre **Blockchain**. Est-on pour autant sûr de la fiabilité de nos données ? Pas vraiment... En effet, reprenons l’exemple de notre groupe de 10 personnes avec Monsieur A et Madame B, si parmi les 10 personnes se trouve quelqu’un avec de mauvaises intentions. Cette personne cherche à se donner plus d’argent en modifiant un registre, il lui suffira d’avoir le contrôle sur plus de 50% du réseau pair-à-pair et de modifier une transaction à la main. En modifiant cette transaction le hash de cette dernière sera forcément changer, ainsi le hash du bloc dans laquelle se trouve la transaction sera également modifié. En effet, comme chacun des utilisateurs doit toujours avoir la même Blockchain que tout le monde, si une personne possède plus de la moitié des noeuds du réseau, il peut induire la minorité restante en erreur en validant une chaine avec des données erronée sur tous les noeuds qu'il controle. En changeant uniquement un bloc, l’attaque échoue car le hash du bloc qui suit dans la chaîne ne stockera pas le bon hash pour le bloc précédent sauf que actuellement il est très rapide de calculer le hash des blocs. Il suffira donc à notre attaquant de recalculer tous les hash de la chaîne pour obtenir une version “valide” de la blockchain malgré la transaction frauduleuse introduite. On va donc pouvoir introduire un nouveau mécanisme dans notre **Blockchain** pour contrer ce genre d’attaques: la preuve de travail (Proof of Work en anglais).
 
 ## La preuve de travail
 La preuve de travail est une manière de dissuader les attaques par déni de service en requérant de la puissance de calcul de l’appareil demandeur du service. Appliqué à la Blockchain cela permet d'éviter une modification frauduleuse des transactions car il serait trop coûteux à notre attaquant de recalculer la totalité des hash de chaque bloc. Le principe de la preuve de travail est de calculer le hash d’un bloc jusqu'à que ce dernier commence par un nombre prédéterminé de 0 en guise d'en-tête du hash, par exemple, au lieu d’avoir des hash de la forme suivante: `5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9` on aura des hash de la forme suivante avec 4 zéros en entete par exemple: `0000b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b`. Pour forcer le hash à prendre cet forme on influe sur les données en entrée de la fonction de hash avec un entier **x** calculer par “brute force”, ce processus s’appelle le **minage**. Il s’agit donc d’essayer avec un **x** allant de 0 à l’infini de 1 en 1, on essayera donc toutes les valeurs possibles jusqu’à obtenir un hash respectant le format souhaité. Pour motiver les utilisateurs du réseau à calculer ces preuves de travail et donc de miner des blocs pour sauvegarder les transactions, on récompense la première personne à miner un nouveau bloc (c’est à dire trouver le **x** inconnu) avec un certain montant de cryptomonnaie, ici on choisira arbitrairement de donner un LoutreCoin (1 LC). Nos transactions ne seront donc effectives qu’à partir du moment où elles se trouveront dans un bloc valide (qui a été miné), on va donc rajouter une liste de transactions en attente dans notre classe `Blockchain` et les fonctions nécessaires pour miner un bloc. De plus, je rajoute une fonction pour instancier la Blockchain avec un bloc contenant 0 transactions. On a donc une classe Blockchain qui ressemble à ce qui suit:
@@ -131,29 +134,24 @@ class Blockchain:
 
     def mine(self, miner):
         pendingSize = len(self.pendingTransactions)
-        if (pendingSize <= 0):
-            print("Not enough pending transactions to mine a new block. Must be > 1")
+        if (pendingSize < self.blockSize):
+            print("Not enough pending transactions to mine a new block. Must be >=", self.blockSize)
             return False
         else:
-            for i in range(0, pendingSize, self.blockSize):
-                end = i + self.blockSize
-                if i >= pendingSize:
-                    end = pendingSize
+            nextTransactions = self.pendingTransactions[0:self.blockSize]
+            currentTime = datetime.now().strftime("%d%m%Y-%H:%M:%S")
 
-                nextTransactions = self.pendingTransactions[i:end]
-                currentTime = datetime.now().strftime("%d%m%Y-%H:%M:%S")
+            newBlock = Block(nextTransactions, currentTime, len(self.chain))
 
-                newBlock = Block(nextTransactions, currentTime, len(self.chain))
+            newBlock.prev = self.chain[-1].hash
+            newBlock.mine(self.header)
 
-                newBlock.prev = self.chain[-1].hash
-                newBlock.mine(self.header)
-
-                self.chain.append(newBlock)
+            self.chain.append(newBlock)
 
             print("Mining pending transactions success!")
 
-            rewardMiner = Transaction("LoutreCoin mining reward", miner, self.mineReward)
-            self.pendingTransactions = [rewardMiner]
+            rewardMiner = Transaction("LoutreCoin", miner, self.mineReward)
+            self.pendingTransactions = self.pendingTransactions[self.blockSize:] + [rewardMiner]
 
         return True
 ```
@@ -188,6 +186,10 @@ class Blockchain:
 
         print("\nBlock Mined! Proof of Work value: ", self.proof)
  ```
+
+### Explication des fonctions `mine()`
+Du coté de la `Blockchain`, la fonction est assez simple car on s'assure d'avoir assez de transactions en attente pour créer un bloc (cela évite des blocs minuscules d'une seule transaction). Ensuite on créer un Bloc avec le nombre de transactions paramétré avec la variable `blockSize` de la classe `Blockchain` et on appele la fonction `mine()` de la classe `Block`.
+Pour la classe `Block` le processus est plus intéressant car c'est ici qu'on cherche à calculer notre preuve de travail. En effet, on sait grâce à l'argument `header` combien de 0 on cherche à obtenir au début de notre hash. On va donc essayer plein de possibilité en incrémentant de 1 l'attribut `proof` de `Block`.
 
 ## Anonymat des utilisateurs et vérification de l'émetteur d’une transaction
 Pour cette dernière partie, nous allons rendre anonyme et unique chaque utilisateur de notre réseau. Actuellement, n’importe qui peut émettre une transaction avec n’importe quelle identité, ce qui est quelque peu problématique. On attribuera donc un portefeuille de **LoutreCoin** à chacun de nos utilisateurs. Ces portefeuilles seront chiffrvia du RSA, qui est un chiffrement asymétrique, c'est-à-dire que le portefeuille possède une clé publique pour recevoir de l’argent et une clé privée pour signer les transactions émanant de ce dernier. Pour passer l’étape d’implémentation du chiffrement RSA, j’utiliserais la bibliothèque **PyCryptoDome**. On aura donc une fonction pour générer et stocker dans des fichiers une paire de clé unique pour chaque utilisateur:
@@ -272,6 +274,6 @@ Pour terminer ce petit projet on a une dernière fonction pour ajouter propremen
 ```
 
 ## Conclusion
-Pour conclure, ce projet est fonctionnel mais comme tout projet il me reste encore mille et une améliorations possibles. Malgré tout j’espère avoir atteint mon objectif qui était de vous introduire au monde captivant de la Cryptomonnaie et de vous permettre d’acquérir toutes les clés pour comprendre le fonctionnement d’une Blockchain à travers le LoutreCoin. De plus ci-dessous vous trouverez un diagramme UML résumant la structure du projet.
+Pour conclure, ce projet est fonctionnel mais comme tout projet il me reste encore mille et une améliorations possibles. Malgré tout j’espère avoir atteint mon objectif qui était de vous introduire au monde captivant de la Cryptomonnaie et de vous permettre d’acquérir toutes les clés pour comprendre le fonctionnement d’une Blockchain à travers le LoutreCoin. Plutôt que de mettre des screens de ma console pour montrer en action ce script, je vous met à disposition le code source. Il vous suffit de clone le repository et d'installer un "venv" python et de lancer un petit `pip install -r requirements.txt`. De plus ci-dessous vous trouverez un diagramme UML résumant la structure du projet.
 
 ![UML](uml.png "UML")
