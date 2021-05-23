@@ -31,25 +31,20 @@ class Blockchain:
             print("Not enough pending transactions to mine a new block. Must be >=", self.blockSize)
             return False
         else:
-            for i in range(0, pendingSize, self.blockSize):
-                end = i + self.blockSize
-                if i >= pendingSize:
-                    end = pendingSize
+            nextTransactions = self.pendingTransactions[0:self.blockSize]
+            currentTime = datetime.now().strftime("%d%m%Y-%H:%M:%S")
 
-                nextTransactions = self.pendingTransactions[i:end]
-                currentTime = datetime.now().strftime("%d%m%Y-%H:%M:%S")
+            newBlock = Block(nextTransactions, currentTime, len(self.chain))
 
-                newBlock = Block(nextTransactions, currentTime, len(self.chain))
+            newBlock.prev = self.chain[-1].hash
+            newBlock.mine(self.header)
 
-                newBlock.prev = self.chain[-1].hash
-                newBlock.mine(self.header)
-
-                self.chain.append(newBlock)
+            self.chain.append(newBlock)
 
             print("Mining pending transactions success!")
 
             rewardMiner = Transaction("LoutreCoin", miner, self.mineReward)
-            self.pendingTransactions = [rewardMiner]
+            self.pendingTransactions = self.pendingTransactions[self.blockSize:] + [rewardMiner]
 
         return True
 
